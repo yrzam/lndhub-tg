@@ -1,0 +1,8 @@
+{
+  "tg": {
+    "controllers": {
+      "rlWindowS": 600,
+      "rlMaxPts": 100
+    }
+  }
+}

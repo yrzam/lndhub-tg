@@ -1,0 +1,16 @@
+{
+  "tg": {
+    "bot": {
+      "token": "BOT_TOKEN",
+      "mongoUrl": "SESSIONS_MONGO_URL"
+    },
+    "controllers": {
+      "rlWindowS": 30,
+      "rlMaxPts": 30
+    }
+  },
+  "model": {
+    "mongoUrl": "MODEL_MONGO_URL",
+    "defaultHubUrl": "DEFAULT_HUB_URL"
+  }
+}

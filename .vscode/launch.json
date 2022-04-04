@@ -1,0 +1,45 @@
+{
+	"version": "1.0.0",
+	"configurations": [
+		{
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"name": "ts-node-dev",
+			"restart": true,
+			"request": "launch",
+			"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/ts-node-dev",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "node",
+			"runtimeArgs": [
+				"--respawn",
+				"-r",
+				"tsconfig-paths/register"
+			],
+			"args": [
+				"${workspaceFolder}/src/index.ts"
+			],
+			"envFile": "${workspaceFolder}/run/.env"
+		},
+		{
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"name": "node",
+			"program": "${workspaceFolder}/build/index.js",
+			"request": "launch",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"runtimeArgs": [
+				"-r",
+				"tsconfig-paths/register"
+			],
+			"type": "node",
+			"envFile": "${workspaceFolder}/run/.env",
+			"env": {
+				"TS_NODE_BASEURL": "./build"
+			}
+		},
+	]
+}

@@ -1,0 +1,23 @@
+version: '3.5'
+services:
+  lndhub-tg-db:
+    image: mongo
+    container_name: lndhub-tg-db
+    restart: unless-stopped
+    expose:
+      - 27017
+    volumes:
+      - './data:/data/db'
+  
+  lndhub-tg:
+    image: lndhub-tg
+    build: ..
+    container_name: lndhub-tg
+    restart: unless-stopped
+    depends_on:
+      - lndhub-tg-db
+    env_file:
+      - .env
+    environment:
+      SESSIONS_MONGO_URL: mongodb://lndhub-tg-db:27017/lndhub-tg
+      MODEL_MONGO_URL: mongodb://lndhub-tg-db:27017/lndhub-tg

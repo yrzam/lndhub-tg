@@ -1,5 +1,7 @@
-# Editor files
-.vscode/env
+# Runtime data and configuration
+run/*
+!run/docker-compose.yaml
+!run/env-guide.md
 
 # Logs
 logs
