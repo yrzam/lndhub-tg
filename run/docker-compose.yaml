@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   lndhub-tg-db:
-    image: mongo
+    image: mongo:4.4
     container_name: lndhub-tg-db
     restart: unless-stopped
     expose:
@@ -11,7 +11,8 @@ services:
   
   lndhub-tg:
     image: lndhub-tg
-    build: ..
+    build:
+      context: ..
     container_name: lndhub-tg
     restart: unless-stopped
     depends_on:
