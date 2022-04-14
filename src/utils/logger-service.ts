@@ -1,7 +1,7 @@
 import winston, { createLogger, format, transports } from 'winston';
 
 const logger = createLogger({
-  level: 'debug',
+  levels: winston.config.syslog.levels,
   format: format.combine(
     format.timestamp(),
     format.errors({ stack: true }),
@@ -12,8 +12,9 @@ const logger = createLogger({
     new transports.Console({
       format: format.combine(
         format.colorize(),
-        format.simple(),
+        format.printf((info) => `${info['timestamp']} ${info.level}: ${info.message}`),
       ),
+      level: 'debug',
     }),
   ],
 });

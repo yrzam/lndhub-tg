@@ -2,6 +2,7 @@ import winston from 'winston';
 import fs from 'fs';
 import { Parser } from 'expr-eval';
 import { findBestMatch } from 'string-similarity';
+import InputError from '@tg/bot/utils/input-error';
 import {
   Amount, currencyService, Currency, SAT,
 } from '../model';
@@ -17,19 +18,19 @@ export type ParsedAmount = {
 
 export type Preferences = {
   currency: string
-  createInvoFiatMultiplier: number
+  fiatMult: number
 };
 
 export class AmountParser {
   static async parse(str: string, preferences: Preferences, locale: string): Promise<ParsedAmount> {
     winston.debug('Parsing request %s with preferences %s', str, preferences);
     const expr = str.split(/\p{L}/u, 1)[0];
-    if (!expr) throw new Error('noExpr');
+    if (!expr) throw new InputError('noExpr');
     let num;
     try {
       num = Parser.parse(expr).evaluate();
-      if (!(num >= 1) || num === Infinity) throw new Error();
-    } catch (err) { throw new Error('invalidExpr'); }
+      if (!(num >= 1) || num === Infinity) throw new InputError('wrongRange');
+    } catch (err) { throw new InputError('invalidExpr'); }
     const currAndComment = str.substring(expr.length).trim().split(/ (.*)/);
     const currId = this.findCurr(currAndComment[0] || preferences.currency, locale)
       || preferences.currency;
@@ -43,7 +44,7 @@ export class AmountParser {
       currency,
       amount: currency.id === SAT.id
         ? new Amount(num, currency)
-        : new Amount(num, currency).div(preferences.createInvoFiatMultiplier),
+        : new Amount(num, currency).mult(preferences.fiatMult),
       biasApplied: currency.id !== SAT.id,
       comment,
     };

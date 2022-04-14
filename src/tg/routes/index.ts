@@ -2,8 +2,9 @@ import type { ControllerName } from '@tg/controllers';
 import DynamicRouterBase from './dyn-router-base';
 
 import BoundCtrl from './entries/bound-ctrl';
-import { ManageWallets, Settings } from './entries/commands';
-import { Receive, Send } from './entries/home';
+import { Admin, ManageWallets, Settings } from './entries/commands';
+import { Home, Receive, Send } from './entries/home';
+import { SimpleInlineInvoice } from './entries/inline';
 import { AddWallet } from './entries/other';
 import { FirstUse } from './entries/start';
 
@@ -20,18 +21,21 @@ const routerConfig : RouterConfig = {
 export class DynamicRouter extends DynamicRouterBase {
   loadRoutes(conf: RouterConfig = routerConfig) {
     this.init();
-
     this.routeDynString(BoundCtrl);
+
+    this.route(SimpleInlineInvoice, 'SimpleInlineInvoice');
+    this.route('inline_query', 'UnavailNotifier');
+
     this.route(FirstUse, 'Help');
-    //    this.route(Admin, 'Admin');
+    this.route(Admin, 'Admin');
     this.route(() => conf.disableAll, 'UnavailNotifier');
+
     this.route(AddWallet, 'AddWallet');
     this.route(ManageWallets, 'ManageWallets');
     this.route(Settings, 'Settings');
-    //    this.route('inline_query', 'InlineInvoice');
     this.route(Receive, 'Receive');
     this.route(Send, 'Send');
-    this.routeStatic('Home');
+    this.route(Home, 'Home');
   }
 }
 

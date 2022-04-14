@@ -94,10 +94,12 @@ export const createInvoice = z.object({
 
 // fixes strange API behavior - strings instead of ints
 export const getInvoiceInfo = z.object({
+
   num_satoshis: z.union([z.number(), z.string()]),
   description: z.string(),
   expiry: z.union([z.number(), z.string()]),
   timestamp: z.union([z.number(), z.string()]),
+
 }).transform((res) => ({
   ...res,
   num_satoshis: parseNum(res.num_satoshis),
@@ -106,7 +108,7 @@ export const getInvoiceInfo = z.object({
 })).refine((res) => Object.values(res).some((el) => !Number.isNaN(el)));
 
 export const payInvoice = z.object({
-  // see above, also has payment_hash but we do not need all that
+  // API has no strict response schema for this
 });
 
 export const error = z.object({

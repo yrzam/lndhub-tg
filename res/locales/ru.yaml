@@ -13,27 +13,39 @@ basic:
   doneButton: ✅ Готово
 
 commands:
-  start: Перезапуск бота
-  wallets: Кошельки
+  home: Домой
+  wallets: Управление кошельками
   settings: Настройки
   cancel: Отмена
 
-inline:
-  invoiceTitle: Счет на ${num} ${currency}${opt(wallet, 'wallet', 'inline.opt.wallet')}
-  invoiceDescription: "Запросить ${amount} сат. ${opt(bias, 'biasPercent', 'inline.opt.bias')}${opt(comment, 'comment', 'inline.opt.comment')}"
-  invoiceMessage:
-    content: "Счет на <b>${num} ${currency}</b>${opt(amount, 'amount', 'inline.opt.amount')}.${opt(comment, 'comment', 'inline.opt.commentInMessage')}${opt(bias, 'biasPercent', 'inline.opt.biasInMessage')}"
-    button: Оплатить ${num} ${currency}
-  payReqTitle: Запросить перевод${opt(wallet, 'wallet', 'inline.opt.wallet')}
-  payReqDescription: Отправитель сам укажет сумму перевода. Ссылка будет многоразовой
-  payReqMessage:
-    content: "<b>Это запрос средств.</b>\n\nНажмите кнопку, чтобы ввести подробности"
-    button: Перевести
+simpleInline:
+  title: Счет на ${num} ${currency}${opt(wallet, 'wallet', 'simpleInline.opt.wallet')}
+  description: "Запросить ${amount} сат. ${opt(bias, 'biasPercent', 'simpleInline.opt.bias')}${opt(description, 'description', 'simpleInline.opt.description')}"
+  qConfirm: "Перевести <b>${num} ${currency}</b> с кошелька <b>${wallet}</b>${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}\n\n${name}, Вы уверены?"
+  message:
+    pending: Создается инвойс на ${num} ${currency}...
+    collapsed: "Счет на <b>${num} ${currency}</b>${opt(amount, 'amount', 'simpleInline.opt.amount')}.${opt(description, 'description', 'simpleInline.opt.descriptionInMessage')}${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}"
+    expanded: "Счет на <b>${num} ${currency}</b>${opt(amount, 'amount', 'simpleInline.opt.amount')}.${opt(description, 'description', 'simpleInline.opt.descriptionInMessage')}${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}\n\nСоздан: ${created}\nИстекает: ${expires}\n\nЗапрос: <code>${payReq}</code>"
+    cancelled: Счет отменен
+    confirmedBySender: 💸 Отправитель сообщил, что счет в размере <b>${num} ${currency}</b> оплачен
+    confirmed: "✅ Перевод <b>${num} ${currency}</b> получен!"
+  buttons:
+    pleaseWait: Подождите...
+    pay: 💸 Оплатить ${num} ${currency}
+    expand: ⏬ Развернуть
+    collapse: ⏫ Свернуть
+    cancel: ❌ Отменить
+    changeWallet: 🔃 Выбрать кошелек
+    back: ⬅️ Назад
+    alreadyPaid: Пометить как оплаченный
+    openWallet: Открыть кошелек
+    yes: Да
+    no: Нет
   opt:
     wallet: " -> ${wallet}"
     bias: "Смещение: ${biasPercent}%"
-    comment: "\nКомментарий: ${comment}"
-    commentInMessage: "\n\n${comment}"
+    description: "\nКомментарий: ${description}"
+    descriptionInMessage: "\n\nКомментарий: ${description}"
     biasInMessage: "\n\n<i>Смещение: ${biasPercent}% от курса</i>"
     amount: " (${amount} сат)"
   noWallets: Сначала нужно создать кошелек. Нажмите здесь
@@ -76,7 +88,7 @@ manageWallets:
 
 home:
   sendReceiveUiMsg: Получение данных кошелька...
-  minimalWallet: "Кошелек <b>${wallet}</b>\n\nБаланс: <b>${balance} ${currency}</b>\n\nОбновлено: ${updated}."
+  minimalWallet: "Кошелек <b>${wallet}</b>\n\nБаланс: <b>${balance} ${currency}</b>\n\nОбновлено: ${updated}"
   expandedWallet: "Кошелек <b>${wallet}</b>\n\nБаланс: <b>${balance} ${currency}</b>${opt(amount, 'amount', 'home.opt.amount')}${opt(bias, 'biasPercent', 'home.opt.bias')}\n\nХост: ${hubUrl}\n\nТранзакции:\n${txs}\n\nСгенерированные инвойсы:\n${pendingInvs}\n\nОбновлено: ${updated}"
   inTx: 🟩 <b>+${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
   outTx: 🟥 <b>-${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
@@ -122,13 +134,14 @@ receive:
     lnCustom: 📨 Бот
     yes: Да
     no: Нет
+    alsoTryInline: Продолжить в инлайне...
   opt:
     bias: "\nСмещение от курса: ${biasPercent}%"
     amount: " (${amount} сат)"
 
 send:
   prompt: "Пожалуйста, пришлите инвойс или фото подходящего QR-кода.\n\n<i>Для отмены нажмите /cancel</i>"
-  qLnConfirm: "Отправить деньги с кошелька <b>${wallet}</b>.\n\nСумма: <b>${num} ${currency}</b>${opt(amount, 'amount', 'send.opt.amount')}${opt(description, 'description', 'send.opt.description')}\nСоздан: ${created}\n\nНажмите кнопку, чтобы произвести перевод"
+  qLnConfirm: "Отправить деньги с кошелька <b>${wallet}</b>.\n\nСумма: <b>${num} ${currency}</b>${opt(amount, 'amount', 'send.opt.amount')}${opt(description, 'description', 'send.opt.description')}\n\nСоздан: ${created}\nИстекает: ${expires}\n\nНажмите кнопку, чтобы произвести перевод"
   lnExpired: "Сумма: <b>${num} ${currency}</b>${opt(amount, 'amount', 'send.opt.amount')}${opt(description, 'description', 'send.opt.description')}\nСоздан: ${created}\n\nВремя оплаты этого инвойса истекло."
   confirmed: Подтверждено
   declined: Отменено
@@ -162,16 +175,18 @@ settings:
     bias: Смещение курса
 
 errors:
-  hubErrors:
+  hub:
     unknown: "Что-то пошло не так\n\n${error}"
     badAuth: Ошибка авторизации
     badPartner: Ошибка у принимающей стороны
     lowBalance: Недостаточный баланс
     invalidInvoice: Недействительный инвойс
+    backendError: Ошибка сервера. Возможно, этот инвойс уже оплачен
+    badArgs: Операция отклонена из-за неверных параметров
     prevInTransit: Предыдущий платеж еще выполняется. Повторите попытку позже
     paymentFailed: Платеж не удался. Возможно, отсутствует путь до получателя
     hubShutdown: Хост закрывается. Пожалуйста, выведите оставшиеся средства
-  inputErrors:
+  input:
     noAction: "Действие не распознано. Пожалуйста, ответьте на вопрос бота.\n\nПрервать операцию - /cancel"
     cbNoAction: Действие не соответствует контексту
     invalidUrl: Некорректный URL. Пожалуйста, попробуйте снова
@@ -183,11 +198,19 @@ errors:
     badAddress: "Некорректный инвойс (${wrongAddr}).\n\nПожалуйста, попробуйте снова"
     qrScanFailed: Не удалось распознать QR-код. Пожалуйста, попробуйте снова
     tooManyWallets: Слишком много кошельков. Удалите существующий, чтобы добавить еще
+    walletNotActive: Этот кошелек не назначен как основной
+  inlineInv:
+    noWallets: ${name}, у вас нет кошельков в боте. Вернитесь назад и добавьте кошелек, либо оплачивайте инвойс внешними средствами
+    notFound: Инвойс не найден
+    unpayable: Инвойс истек либо уже был оплачен
+    unknown: Что-то пошло не так
+    createFailed: "Не удалось создать инвойс.\n\nОшибка кошелька: <i>${walletError}</i>"
+    paymentFailed: "Не удалось оплатить инвойс"
   reqInvalid: Некорректный запрос
   ansInvalid: Получен некорректный ответ
   noConnection: Не удалось установить соединение
   rateLimited: Превышена допустимая частота запросов
-  unknown: "Неизвестная ошибка\n\n${error}"
+  unknown: Простите, что-то пошло не так
   noTxEntry: Такой транзакции не существует
 
 languages:

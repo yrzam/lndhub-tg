@@ -8,7 +8,7 @@ export type Currency = {
   inSats: Sats
 };
 
-export interface CurrencyAPI {
+export interface ICurrencyAPI {
   getRates(): Promise<CurrencyApiObj>;
 }
 
@@ -18,7 +18,7 @@ export const SAT: Currency = {
 };
 
 export class CurrencyService {
-  private api: CurrencyAPI;
+  private api: ICurrencyAPI;
 
   private cache: {
     api: Cache,
@@ -26,7 +26,7 @@ export class CurrencyService {
   };
 
   constructor(params: {
-    api: CurrencyAPI,
+    api: ICurrencyAPI,
     cache: {
       api: Cache,
       ttl: number

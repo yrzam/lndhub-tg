@@ -4,11 +4,10 @@ export default class PayReqError extends Error {
   readonly req;
 
   constructor(
-    message: string,
     type: 'btc' | 'ln' | 'other',
     req: string,
   ) {
-    super(message);
+    super(`Invalid payReq. Type=${type}`);
     this.reqType = type;
     this.req = req;
   }

@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import winston from 'winston';
 import { z } from 'zod';
-import { CurrencyAPI, CurrencyApiObj } from '../logic/currency/interfaces';
+import { ICurrencyAPI, CurrencyApiObj } from '../logic/currency/interfaces';
 
 const prs = z.record(
   z.object({
@@ -13,11 +13,13 @@ const prs = z.record(
   return obj;
 });
 
-export default class BlockchainCom implements CurrencyAPI {
+export default class BlockchainCom implements ICurrencyAPI {
   async getRates(): Promise<CurrencyApiObj> {
     winston.debug('Obtaining exchange rates from blockchain.info...');
-    return fetch('https://blockchain.info/ticker')
+    const rates = await fetch('https://blockchain.info/ticker')
       .then((res) => res.json())
       .then((res) => prs.parse(res));
+    winston.debug('Exchange rates updated');
+    return rates;
   }
 }

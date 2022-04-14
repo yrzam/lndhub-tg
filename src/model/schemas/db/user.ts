@@ -7,7 +7,10 @@ export type TSUser = {
 
 const user = new mongoose.Schema<TSUser>({
   _id: Number,
-  wallets: [mongoose.Schema.Types.ObjectId],
+  wallets: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'wallet',
+  }],
 });
 
 export const Users = mongoose.model('user', user);

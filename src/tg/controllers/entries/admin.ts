@@ -1,4 +1,4 @@
-import { CustomCtx } from '@tg/bot';
+import type { CustomCtx } from '@tg/bot';
 import { setCommands } from '@tg/bot/utils/set-commands';
 import { Controller } from '../base';
 

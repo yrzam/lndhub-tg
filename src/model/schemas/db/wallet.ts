@@ -7,6 +7,10 @@ export type TSWallet = {
   password: string,
   name: string,
   sortPriority: number
+  sessionBackup?: {
+    accessToken: string,
+    refreshToken: string
+  }
 };
 
 const wallet = new mongoose.Schema<TSWallet>({
@@ -15,6 +19,13 @@ const wallet = new mongoose.Schema<TSWallet>({
   password: { type: String, required: true },
   name: { type: String, required: false },
   sortPriority: { type: Number, default: 0 },
+  sessionBackup: {
+    type: {
+      accessToken: { type: String, required: true },
+      refreshToken: { type: String, required: true },
+    },
+    required: false,
+  },
 });
 
 export const Wallets = mongoose.model('wallet', wallet);

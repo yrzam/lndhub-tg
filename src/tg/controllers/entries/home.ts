@@ -1,72 +1,40 @@
-import view from '@tg/views';
 import type { CustomCtx } from '@tg/bot';
 import qr from 'qrcode';
-import { LnInvoice } from '@model/.';
+import escRegex from 'escape-regexp';
+import { cb, cbPrefixes, qrParams } from '@tg/constants';
+import view from '@tg/views';
+import { UnpaidInvoice, Wallet } from '@model';
 import { Controller } from '../base';
+
+const walletOpPrefs = [cbPrefixes.home.collapse, cbPrefixes.home.expand,
+  cbPrefixes.home.collapsedRefresh, cbPrefixes.home.expandedRefresh];
 
 export default class Home extends Controller {
   override use() {
     this.controller.callbackQuery(
-      /^(expand|collapse)-txs-for-.+/,
+      new RegExp(`${walletOpPrefs.map((el) => `(${escRegex(el)})`).join('|')}.+`),
       async (ctx) => {
-        const op = ctx.callbackQuery.data.split('-')[0] as 'expand' | 'collapse';
-        const reqWalletId = ctx.callbackQuery.data.split('-').slice(3).join('-');
-        const wallet = ctx.wallets.getActive();
-        if (wallet.id !== reqWalletId) return view('Home.notAnActiveWallet', ctx);
-        wallet.cacheBehaviorNext('flushOnMiss');
-        if (op === 'expand') {
-          if (!wallet.hasCached('all')) ctx.wallets.rl('active', 4);
-          await view('Home.expandTxs', ctx, {
-            // Order is important because new balance must stay in cache
-            txs: await wallet.txs,
-            unpaidInvs: await wallet.unpaidInvoices,
-            balance: await wallet.balance,
-            lastUpdate: wallet.lastCacheUpdate || new Date(),
-            ...ctx.wallets.getPublicData(wallet),
-          });
-        } else if (op === 'collapse') {
-          await view('Home.collapseTxs', ctx, {
-            balance: await wallet.balance,
-            lastUpdate: wallet.lastCacheUpdate || new Date(),
-            ...ctx.wallets.getPublicData(wallet),
-          });
+        const prefix = walletOpPrefs
+          .find((el) => ctx.callbackQuery.data.startsWith(el)) as string;
+        const isRefresh = ctx.callbackQuery.data.startsWith(cbPrefixes.home.collapsedRefresh)
+          || ctx.callbackQuery.data.startsWith(cbPrefixes.home.expandedRefresh);
+        if (isRefresh && Math.random() < 0.1) ctx.wallets.sprior(1);
+        const wallet = ctx.wallets.getActive({ useCache: !isRefresh });
+        if (wallet.id !== ctx.callbackQuery.data.substring(prefix.length)) {
+          await view('Home.notAnActiveWallet', ctx);
+          return;
         }
-        wallet.cacheBehaviorNext('normal');
-        return undefined;
+        if (ctx.callbackQuery.data.startsWith(cbPrefixes.home.expand)
+          || ctx.callbackQuery.data.startsWith(cbPrefixes.home.expandedRefresh)) {
+          await this.showExpandedWallet(wallet, ctx);
+        } else await this.showCollapsedWallet(wallet, ctx);
       },
     );
 
     this.controller.callbackQuery(
-      /^(expanded|collapsed)-refresh-for-.+/,
-      async (ctx) => {
-        const viewType = ctx.callbackQuery.data.split('-')[0] as 'expanded' | 'collapsed';
-        const reqWalletId = ctx.callbackQuery.data.split('-').slice(3).join('-');
-        const wallet = ctx.wallets.getActive({ useCache: false });
-        if (wallet.id !== reqWalletId) return view('Home.notAnActiveWallet', ctx);
-        if (viewType === 'expanded') {
-          ctx.wallets.rl('active', 4);
-          await view('Home.refreshExpanded', ctx, {
-            txs: await wallet.txs,
-            unpaidInvs: await wallet.unpaidInvoices,
-            balance: await wallet.balance,
-            lastUpdate: wallet.lastCacheUpdate || new Date(),
-            ...ctx.wallets.getPublicData(wallet),
-          });
-        } else if (viewType === 'collapsed') {
-          ctx.wallets.rl('active', 1);
-          await view('Home.refreshCollapsed', ctx, {
-            balance: await wallet.balance,
-            lastUpdate: wallet.lastCacheUpdate || new Date(),
-            ...ctx.wallets.getPublicData(wallet),
-          });
-        }
-        return undefined;
-      },
+      cb.home.delDetailed,
+      (ctx) => view('Home.delDetailed', ctx),
     );
-
-    this.controller.callbackQuery('home-del-detailed', async (ctx) => {
-      await view('Home.delDetailed', ctx);
-    });
 
     this.controller.on('message::bot_command', async (ctx, next) => {
       const commandText = ctx.message.text?.slice(1).split(' ')[0];
@@ -79,16 +47,8 @@ export default class Home extends Controller {
         await view('Home.entryDetailed', ctx, {
           index: num + 1,
           entry,
-          qr: (entry instanceof LnInvoice && entry.isPayable && entry.payReq)
-            ? await qr.toBuffer(entry.payReq.str, {
-              type: 'png',
-              margin: 2,
-              scale: 6,
-              color: {
-                dark: '#000',
-                light: '#fff',
-              },
-            })
+          qr: (entry instanceof UnpaidInvoice && entry.isPayable)
+            ? await qr.toBuffer(entry.payReq.str, qrParams)
             : undefined,
         });
       }
@@ -96,12 +56,43 @@ export default class Home extends Controller {
   }
 
   override async defaultHandler(ctx: CustomCtx) {
-    const wallet = ctx.wallets.rl('active', 1).getActive({ useCache: false });
+    const wallet = ctx.wallets.getActive({ useCache: false });
+    if (Math.random() < 0.1) ctx.wallets.sprior(1);
     await view('Home.sendReceiveUi', ctx, ctx.wallets.getPublicData(wallet));
-    await view('Home.wallet', ctx, {
+    await this.showCollapsedWallet(wallet, ctx, 'send');
+  }
+
+  private async showExpandedWallet(
+    wallet: Wallet,
+    ctx: CustomCtx,
+    action?: 'send' | 'edit',
+  ) {
+    if (!wallet.hasCached('all')) ctx.wallets.rl('active', 4);
+    wallet.cacheBehaviorNext('flushOnMiss');
+    await view('Home.showExpanded', ctx, {
+      action: action || 'edit',
+      txs: await wallet.txs,
+      unpaidInvs: await wallet.unpaidInvoices,
       balance: await wallet.balance,
       lastUpdate: wallet.lastCacheUpdate || new Date(),
       ...ctx.wallets.getPublicData(wallet),
     });
+    wallet.cacheBehaviorNext('normal');
+  }
+
+  private async showCollapsedWallet(
+    wallet: Wallet,
+    ctx: CustomCtx,
+    action?: 'send' | 'edit',
+  ) {
+    if (!wallet.hasCached('balance')) ctx.wallets.rl('active', 1);
+    wallet.cacheBehaviorNext('flushOnMiss');
+    await view('Home.showCollapsed', ctx, {
+      action: action || 'edit',
+      balance: await wallet.balance,
+      lastUpdate: wallet.lastCacheUpdate || new Date(),
+      ...ctx.wallets.getPublicData(wallet),
+    });
+    wallet.cacheBehaviorNext('normal');
   }
 }

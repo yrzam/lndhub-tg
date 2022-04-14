@@ -1,92 +1,92 @@
+import { Filter } from 'grammy';
 import { Router } from '@grammyjs/router';
-import { currencyService } from '@model/.';
-import { CustomCtx } from '@tg/bot';
+import { currencyService } from '@model';
+import type { CustomCtx } from '@tg/bot';
 import InputError from '@tg/bot/utils/input-error';
+import { cb as cbFixed, cbPrefixes } from '@tg/constants';
 import view from '@tg/views';
-import { tToFilt } from '@utils/i18n-service';
+import { tToAll } from '@utils/i18n-service';
 import { Controller } from '../base';
 
-type State = {
-  answerTo: 'bias' | 'kbAction',
-};
+const cb = { ...cbFixed.settings, ...cbPrefixes.settings };
 
-function expect(step: State['answerTo'], ctx: CustomCtx) {
-  (ctx.state as State).answerTo = step;
-}
+type Ctx = CustomCtx & {
+  state: {
+    step?: 'bias' | 'kbAction',
+    // used by view
+    msgToEdit?: number
+  }
+};
 
 export default class Settings extends Controller {
   override use() {
-    this.controller.hears(tToFilt('basic.doneButton'), async (ctx) => {
-      await this.reroute(ctx, 'Home');
+    this.controller.hears(
+      tToAll('basic.doneButton'),
+      (ctx) => this.reroute(ctx, 'Home'),
+    );
+
+    const kb = new Router<Filter<Ctx, 'callback_query:data'>>((ctx) => {
+      ctx.state.step = 'kbAction';
+      return Object.values(cb).find((v) => ctx.callbackQuery.data.startsWith(v));
     });
 
-    const kb = new Router<CustomCtx>((ctx: CustomCtx) => {
-      if (ctx.callbackQuery?.data) {
-        (ctx.state as State).answerTo = 'kbAction';
-        return ctx.callbackQuery.data.split('-')[1];
-      }
-      return undefined;
-    });
+    kb.route(cb.main, (ctx) => view('Settings.main', ctx, 'edit'));
 
-    kb.route('main', async (ctx) => {
-      await view('Settings.main', ctx, 'edit');
-    });
+    kb.route(cb.lang, (ctx) => view('Settings.language', ctx));
 
-    kb.route('language', async (ctx) => {
-      await view('Settings.language', ctx);
-    });
-
-    kb.route('setlang', async (ctx) => {
-      const newLang = ctx.callbackQuery?.data?.split('-').slice(-1)[0];
+    kb.route(cb.setLang, async (ctx) => {
+      const newLang = ctx.callbackQuery.data.substring(cb.setLang.length);
       if (!newLang) throw new InputError('noSuchLanguage');
       ctx.i18n.locale(newLang);
       await view('Settings.main', ctx, 'edit');
     });
 
-    kb.route('currency', async (ctx) => {
-      const pageNum = parseInt(ctx.callbackQuery?.data?.split('-').slice(-1)[0] || '', 10);
+    kb.route(cb.currPage, async (ctx) => {
+      const pageNum = parseInt(ctx.callbackQuery?.data
+        ?.substring(cb.currPage.length), 10);
       await view('Settings.currency', ctx, { page: pageNum || 0 });
     });
 
-    kb.route('setcurr', async (ctx) => {
-      const newCurr = ctx.callbackQuery?.data?.split('-').slice(-1)[0];
-      if (!newCurr || !(await currencyService.currencies).find((el) => el === newCurr)) {
+    kb.route(cb.setCurr, async (ctx) => {
+      const newCurr = ctx.callbackQuery?.data?.substring(cb.setCurr.length);
+      if (!newCurr || !(await currencyService.currencies)
+        .find((el) => el === newCurr)) {
         throw new InputError('noSuchCurrency');
       }
       ctx.session.pref.currency = newCurr;
       await view('Settings.main', ctx, 'edit');
     });
 
-    kb.route('bias', async (ctx) => {
-      expect('bias', ctx);
+    kb.route(cb.bias, async (ctx) => {
       await view('Settings.changeBias', ctx);
+      ctx.state.step = 'bias';
     });
 
-    const conv = new Router<CustomCtx>((ctx) => (ctx.state as State).answerTo);
+    const conv = new Router<Filter<Ctx, 'message:text'>>((ctx) => ctx.state.step);
 
     conv.route('bias', async (ctx) => {
-      const num = parseFloat(ctx.message?.text || '');
+      const num = parseFloat(ctx.message.text);
       if (num > -100 && num < 10000) {
-        ctx.session.pref.createInvoFiatMultiplier = (num + 100) / 100;
-        expect('kbAction', ctx);
+        ctx.session.pref.fiatMult = (num + 100) / 100;
         await view('Settings.readyUi', ctx);
         await view('Settings.main', ctx, 'send');
+        ctx.state.step = 'kbAction';
       } else throw new InputError('invalidNumber');
     });
 
-    this.controller.use(kb);
-    this.controller.use(conv);
+    this.controller.on('callback_query:data', kb);
+    this.controller.on('message:text', conv);
   }
 
-  override async defaultHandler(ctx: CustomCtx) {
-    if ((ctx.state as State).answerTo) throw new InputError('noAction');
-    expect('kbAction', ctx);
+  override async defaultHandler(ctx: Ctx) {
+    if (ctx.state.step) throw new InputError('noAction');
     await view('Settings.readyUi', ctx);
     await view('Settings.main', ctx, 'send');
     this.useAsNext(ctx);
+    ctx.state.step = 'kbAction';
   }
 
-  override async exitHandler(ctx: CustomCtx) {
+  override async exitHandler(ctx: Ctx) {
     await view('Settings.exitUi', ctx);
   }
 }

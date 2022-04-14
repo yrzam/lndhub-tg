@@ -1,12 +1,11 @@
 /* eslint-disable no-underscore-dangle */
-import { tMatch } from '@utils/i18n-service';
 import type { CustomCtx } from '@tg/bot';
 import type { ControllerName } from '@tg/controllers';
 import { commands } from '@tg/bot/utils/set-commands';
 import { exitHandlerForCtrl } from '@tg/controllers/utils/ctrl-route-helper';
 
 export default async function BoundCtrl(ctx: CustomCtx): Promise<undefined | ControllerName> {
-  if (tMatch(ctx.message?.text, 'basic.cancelButton')
+  if (ctx.util.tHeard('basic.cancelButton') || ctx.message?.text?.startsWith('/start')
     || commands.some((el) => ctx.message?.text?.startsWith(`/${el}`))) {
     if (ctx.session._boundCtrls[ctx.chatTypeStr]) {
       try {

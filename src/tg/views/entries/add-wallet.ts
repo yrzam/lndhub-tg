@@ -3,12 +3,7 @@ import type { CustomCtx } from '@tg/bot';
 import { esc } from '@utils/i18n-service';
 
 const AddWallet = {
-  redirectFromInline: async (ctx: CustomCtx) => {
-    await ctx.answerInlineQuery([], {
-      switch_pm_parameter: 'addwallet',
-      switch_pm_text: ctx.i18n.t('inline.noWallets'),
-    });
-  },
+
   askCreateOrImport: async (ctx: CustomCtx, data: { allowCancel: boolean }) => {
     let kb = new Keyboard()
       .text(ctx.i18n.t('addWallet.buttons.create'))
@@ -21,6 +16,7 @@ const AddWallet = {
       },
     });
   },
+
   askCreateDefaultOrCustom: async (ctx: CustomCtx) => {
     await ctx.util.tReply('addWallet.qCreateDefaultOrCustom', {
       reply_markup: {
@@ -34,19 +30,30 @@ const AddWallet = {
       },
     });
   },
+
   askCreateCustomUrl: async (ctx: CustomCtx) => {
-    await ctx.util.tReply('addWallet.qCreateCustomUrl', { reply_markup: { remove_keyboard: true } });
+    await ctx.util.tReply('addWallet.qCreateCustomUrl', {
+      reply_markup: { remove_keyboard: true },
+    });
   },
+
   askImportUrl: async (ctx: CustomCtx) => {
-    await ctx.util.tReply('addWallet.qImportUrl', { reply_markup: { remove_keyboard: true } });
+    await ctx.util.tReply('addWallet.qImportUrl', {
+      reply_markup: { remove_keyboard: true },
+    });
   },
+
   pending: async (ctx: CustomCtx, data: { verbose: boolean }) => {
     if (data.verbose) await ctx.util.tReply('addWallet.pending');
     else await ctx.replyWithChatAction('typing');
   },
+
   chooseName: async (ctx: CustomCtx) => {
-    await ctx.util.tReply('addWallet.qName', { reply_markup: { remove_keyboard: true } });
+    await ctx.util.tReply('addWallet.qName', {
+      reply_markup: { remove_keyboard: true },
+    });
   },
+
   saveKey: async (ctx: CustomCtx, data: { backup: string }) => {
     await ctx.reply(ctx.i18n.t('addWallet.saveKey', { backup: esc(data.backup) }), {
       reply_markup: {
@@ -57,6 +64,7 @@ const AddWallet = {
       },
     });
   },
+
 };
 
 export default AddWallet;

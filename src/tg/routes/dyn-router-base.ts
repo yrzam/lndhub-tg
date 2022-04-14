@@ -73,7 +73,7 @@ export default abstract class DynamicRouterBase {
       try {
         await next();
       } catch (err) {
-        if (err instanceof BotError) await commonErrHandler(err);
+        await commonErrHandler(err instanceof BotError ? err : new BotError(err, ctx));
       } finally {
         if (ctx.reroute.target) {
           const { target, state } = ctx.reroute;
@@ -82,7 +82,7 @@ export default abstract class DynamicRouterBase {
           try {
             await this.controllers[target].onReroutedFn(ctx, state);
           } catch (err) {
-            if (err instanceof BotError) await commonErrHandler(err);
+            await commonErrHandler(err instanceof BotError ? err : new BotError(err, ctx));
           }
         }
       }

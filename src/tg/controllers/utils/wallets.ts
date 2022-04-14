@@ -2,7 +2,8 @@
 import config from 'config';
 import { NextFunction } from 'grammy';
 import type { CustomCtx } from '@tg/bot';
-import { Wallet, WalletError, User } from '@model/.';
+import { Wallet, WalletError, User } from '@model';
+import winston from '@utils/logger-service';
 
 export type WalletPublicData = {
   id: string,
@@ -19,10 +20,15 @@ export class WalletContextBinding {
   }
 
   makeActive(wallet: string | Wallet) {
+    const walletId = typeof wallet === 'string' ? wallet : wallet.id;
+    winston.info('Changing active wallet to %s for user %s', walletId, this.ctx.from?.id);
     this.ctx.session._activeWallet = {
-      id: typeof wallet === 'string' ? wallet : wallet.id,
+      id: walletId,
       cache: {},
-      rl: { pts: 0, startTimestamp: 0 },
+      rl: {
+        pts: this.ctx.session._activeWallet?.rl.pts || 0,
+        startTimestamp: this.ctx.session._activeWallet?.rl.startTimestamp || 0,
+      },
     };
     return this;
   }
@@ -43,6 +49,7 @@ export class WalletContextBinding {
   }
 
   async add(wallet: Wallet) {
+    winston.info('Adding wallet %s for user %s', wallet.id, this.ctx.from?.id);
     if (typeof this.ctx.from?.id !== 'number') throw new Error('No user id');
     const wsession = await new User(this.ctx.from.id).assignWallet(wallet);
     this.ctx.session._wallets.push(wsession);
@@ -59,6 +66,8 @@ export class WalletContextBinding {
     const globalRl = this.ctx.session._globalWalletRl;
     const window = (config.get('tg.controllers.rlWindowS') as number) * 1000;
     const max = (config.get('tg.controllers.rlMaxPts') as number);
+    winston.debug('Rl: user %s, target %s, pts+=%d, window=%d, max=%d'
+      + '', this.ctx.from?.id, target, pts, window, max);
     if (new Date().getTime() - globalRl.startTimestamp > window) {
       globalRl.startTimestamp = new Date().getTime();
       globalRl.pts = 0;
@@ -82,24 +91,23 @@ export class WalletContextBinding {
 
   sprior(delta: number | 'clear', wallet? : Wallet | string) {
     const walletId = typeof wallet === 'string' ? wallet : wallet?.id || this.getActive().id;
-    const entry = this.ctx.session._wallets.find((el) => el.id === walletId);
-    if (entry) {
-      if (typeof delta === 'number') entry.sortPriority += delta;
-      else entry.sortPriority = 0;
-    }
+    winston.debug('Sprior wallet %s for user %s: ', walletId, this.ctx.from?.id, delta);
+    const entry = this.getDataById(walletId);
+    if (typeof delta === 'number') entry.sortPriority += delta;
+    else entry.sortPriority = 0;
     return this;
   }
 
   async rename(wallet: Wallet | string, newName: string) {
     const w = typeof wallet === 'string' ? new Wallet(wallet) : wallet;
+    winston.info('Renaming wallet %s for user %s', w.id, this.ctx.from?.id);
     await w.edit({ name: newName });
-    const entry = this.ctx.session._wallets.find((el) => el.id === w.id);
-    if (!entry) throw new Error('No wallet');
-    entry.name = newName;
+    this.getDataById(w.id).name = newName;
   }
 
   async remove(wallet: Wallet | string) {
     const w = typeof wallet === 'string' ? new Wallet(wallet) : wallet;
+    winston.info('Removing wallet %s from user %s', w.id, this.ctx.from?.id);
     if (typeof this.ctx.from?.id !== 'number') throw new Error('No user id');
     await new User(this.ctx.from.id).detachWallet(w);
     this.ctx.session._wallets = this.ctx.session._wallets.filter((el) => el.id !== w.id);
@@ -114,11 +122,18 @@ export class WalletContextBinding {
     await w.delete();
   }
 
+  getById(walletId : string): Wallet {
+    const wData = this.getDataById(walletId);
+    const wallet = new Wallet(
+      wData.id,
+      wData.authData,
+    );
+    return wallet;
+  }
+
   getActive({ useCache = true }:
   { useCache?: boolean } = {}): Wallet {
-    const wData = this.ctx.session._wallets
-      .find((el) => el.id === this.ctx.session._activeWallet?.id);
-    if (!wData) throw new Error('Active wallet not found');
+    const wData = this.getDataById(this.ctx.session._activeWallet?.id);
     const wallet = new Wallet(
       wData.id,
       wData.authData,
@@ -128,9 +143,17 @@ export class WalletContextBinding {
     return wallet;
   }
 
+  async checkOwnership(wallet: Wallet) {
+    if (typeof this.ctx.from?.id !== 'number') throw new Error('No user id');
+    winston.debug('checkOwnership of wallet %s, user %s', wallet.id, this.ctx.from?.id);
+    const owns = await new User(this.ctx.from.id).owns(wallet);
+    if (!owns) throw new Error('Ownership check failed');
+    return wallet;
+  }
+
   async getBackupNonActive(walletId: string) : Promise<string> {
-    // check ownership
-    return new Wallet(walletId).backup;
+    const wallet = new Wallet(walletId);
+    return (await this.checkOwnership(wallet)).backup;
   }
 
   reload() {
@@ -162,6 +185,14 @@ export class WalletContextBinding {
     });
   }
 
+  private getDataById(id: string | undefined) {
+    if (!id) throw new Error('No wallet id');
+    const wData = this.ctx.session._wallets
+      .find((el) => el.id === id);
+    if (!wData) throw new Error('Active wallet not found');
+    return wData;
+  }
+
   private getUnsortedPublicData() {
     return this.ctx.session._wallets.map(({
       name, id, sortPriority, authData,
@@ -171,14 +202,12 @@ export class WalletContextBinding {
   }
 
   private sortPublicData(arr: Array<WalletPublicData>): Array<WalletPublicData> {
-    const array = arr.sort((a, b) => a.sortPriority - b.sortPriority);
-    const activeW = this.ctx.session._activeWallet;
-    if (activeW && arr.length > 1) {
-      const activeIndex = arr.findIndex((el) => el.id === activeW.id);
-      if (arr[activeIndex]) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        [array[0], array[activeIndex]] = [array[activeIndex]!, array[0]!];
-      }
+    let array = arr.sort((a, b) => b.sortPriority - a.sortPriority);
+    const activeIndex = array.findIndex((el) => el.id
+      === this.ctx.session._activeWallet?.id);
+    if (activeIndex !== -1) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      array = [array[activeIndex]!, ...array.filter((_, i) => i !== activeIndex)];
     }
     return array;
   }

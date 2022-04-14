@@ -6,14 +6,14 @@
  * minimal efforts.
  */
 
-import type { WalletCacheData, UserWalletEntryMeta } from '@model/.';
+import type { WalletCacheData, UserWalletEntryMeta } from '@model';
 import type { RateLimiterData } from '@tg/controllers/utils/wallets';
 import type { Preferences as FinPreferences } from '@utils/amount-parser';
 import type { ControllerName } from '@tg/controllers';
 import type { ChatTypeCompFlavor } from '../utils/chat-type';
 
 // real db schema is managed by grammy
-export interface SessionSchema {
+export type SessionSchema = {
   // Defines whether session is possibly out of sync with model
   // and must be updated
   syncWithModelRequired: boolean,
@@ -24,13 +24,13 @@ export interface SessionSchema {
   _ctrlStates: Partial<Record<ChatTypeCompFlavor['chatTypeStr'],
   Partial<Record<ControllerName, Record<string, unknown>>>>>,
   _globalWalletRl: RateLimiterData
-}
+};
 
 export const sessionDefaults: SessionSchema = {
   syncWithModelRequired: true, // new user? Or wiped session
   pref: {
     currency: 'SAT',
-    createInvoFiatMultiplier: 1,
+    fiatMult: 1,
   },
   _wallets: [],
   _boundCtrls: {},

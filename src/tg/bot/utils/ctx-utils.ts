@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
+import { TemplateData } from '@grammyjs/i18n/dist/source';
+import { tToAll } from '@utils/i18n-service';
 import { NextFunction } from 'grammy';
-import { CustomCtx } from './custom-ctx';
+import type { CustomCtx } from './custom-ctx';
 
 export class CtxUtil {
   private ctx;
@@ -31,13 +33,22 @@ export class CtxUtil {
     return this.updateText(...args);
   }
 
-  updateTextOrReply(action: 'send' | 'edit', ...args: Parameters<CustomCtx['editMessageText']>) {
+  updateTextOrReply(
+    action: 'send' | 'edit',
+    ...args: Parameters<CustomCtx['editMessageText']>
+  ) {
     if (action === 'send') return this.reply(...args);
     return this.updateText(...args);
   }
 
   delete() {
     return this.ctx.deleteMessage().catch((e) => e);
+  }
+
+  tHeard(k: string, templateData: Readonly<TemplateData> = {}): boolean {
+    if (!this.ctx.message?.text) return false;
+    const translations = tToAll(k, templateData);
+    return translations.includes(this.ctx.message.text);
   }
 
   static async middleware(ctx: CustomCtx, next: NextFunction) {

@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import Amount from '../currency/amount';
+import { Amount } from '../../currency';
 
 export type BaseTx = {
   type: 'onchain' | 'offchain',

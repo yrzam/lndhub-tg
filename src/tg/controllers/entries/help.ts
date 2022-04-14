@@ -3,10 +3,11 @@ import view from '@tg/views';
 import { Controller } from '../base';
 
 export default class Help extends Controller {
-  override async defaultHandler(ctx: CustomCtx) {
-    if (ctx.message?.text?.startsWith('/start') && !ctx.wallets.exist) {
+  override use() {
+    this.controller.command('start', async (ctx : CustomCtx) => {
+      if (ctx.wallets.exist) return;
       await view('StaticMsg.greeting', ctx);
       await this.reroute(ctx, 'AddWallet');
-    }
+    });
   }
 }

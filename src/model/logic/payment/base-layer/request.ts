@@ -1,4 +1,4 @@
-import PayReqError from '../../schemas/errors/payreq';
+import { PayReqError } from '@model/schemas/errors';
 
 type ReqType = 'ln' | 'btc' | 'other';
 
@@ -19,7 +19,7 @@ export class PaymentRequest {
         str = str.substring('lightning:'.length);
       }
       if (!str.startsWith('ln')) {
-        throw new PayReqError('Invalid payment request', 'ln', str);
+        throw new PayReqError('ln', str);
       }
     }
     return str;

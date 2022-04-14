@@ -27,6 +27,7 @@ export class Bot {
     sessionDbUrl?: string,
     sessionMutator?: string
   }) {
+    winston.debug('Constructing Bot with parameters: %s', opt || 'none');
     this.bot = new TgBot(token, {
       client: {
         ...(opt?.apiRoot ? { apiRoot: opt.apiRoot } : {}),
@@ -48,9 +49,8 @@ export class Bot {
   }
 
   async start(): Promise<void> {
-    winston.debug('Launching bot: connecting to session DB...');
+    winston.info('Initializing bot...');
     await this.sessionDB.start();
-    winston.debug('Launching bot: connection with session DB established');
     this.bot.use(session({
       initial: () => (sessionDefaults),
       storage: new MongoDBAdapter({
@@ -64,11 +64,15 @@ export class Bot {
 
     winston.debug('Middlewares attached, connecting to Telegram...');
     this.bot.start();
+    winston.info('Bot started');
   }
 
   async stop(): Promise<void> {
+    winston.info('Shutting down bot...');
+    winston.debug('Stopping bot: disconnecting from Telegram');
     await this.bot.stop();
-    return this.sessionDB.stop();
+    await this.sessionDB.stop();
+    winston.info('Bot stopped gracefully');
   }
 
   private logicMiddleware() {

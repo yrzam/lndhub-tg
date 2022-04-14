@@ -7,8 +7,7 @@ export default class AmountPresenter {
     preferences: Preferences,
   ): Promise<number> {
     const realAmount = preferences.currency === SAT.id
-      ? amount
-      : amount.mult(preferences.createInvoFiatMultiplier);
+      ? amount : amount.div(preferences.fiatMult);
     return realAmount.get(await rates.getById(preferences.currency));
   }
 }

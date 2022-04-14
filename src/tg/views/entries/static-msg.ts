@@ -1,6 +1,7 @@
 import type { CustomCtx } from '../../bot';
 
 const StaticMsg = {
+
   sendUnavail: async (ctx: CustomCtx) => {
     if (ctx.inlineQuery) {
       await ctx.answerInlineQuery([], {
@@ -9,9 +10,11 @@ const StaticMsg = {
       });
     } else { await ctx.util.tReply('static.unavail'); }
   },
+
   greeting: async (ctx: CustomCtx) => {
     await ctx.util.tReply('greeting', { disable_web_page_preview: true });
   },
+
 };
 
 export default StaticMsg;

@@ -36,20 +36,6 @@ export function tToAll(k: string, templateData: Readonly<TemplateData> = {}) : A
   return res as Array<string>;
 }
 
-export function tToFilt(k: string, templateData: Readonly<TemplateData> = {}) {
-  return new RegExp(tToAll(k, templateData).join('|'));
-}
-
-export function tMatch(
-  compTo: string | undefined,
-  k: string,
-  templateData: Readonly<TemplateData> = {},
-): boolean {
-  if (!compTo) return false;
-  const translations = tToAll(k, templateData);
-  return translations.includes(compTo);
-}
-
 export function esc(str: string) {
   return html.escape(str);
 }

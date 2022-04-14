@@ -1,5 +1,6 @@
 import winston from 'winston';
 import { flatten } from 'flat';
+import { GrammyError } from 'grammy';
 import type { CustomCtx } from '../bot';
 import views from './enum';
 
@@ -25,6 +26,12 @@ type PathValue<T, P extends Path<T>> =
 // eslint-disable-next-line @typescript-eslint/ban-types
 const flattenViewsObj: Record<string, Function> = flatten(views);
 
+function inspectError(err: Error) {
+  if (!(err instanceof GrammyError) || err.description.includes('can\'t parse entities')) {
+    winston.error('Caught view error: %s', err.stack);
+  }
+}
+
 export default async function send<
   T extends Path<typeof views>,
   V extends PathValue<typeof views, T>>(
@@ -36,7 +43,10 @@ export default async function send<
     return await flattenViewsObj[view]?.(...args)
       || await flattenViewsObj[`${view}.default`]?.(...args);
   } catch (err) {
-    if (err instanceof Error) winston.debug('Unhandled view error: %s', err.message);
+    if (err instanceof Error) {
+      winston.debug('Unhandled view %s error: %s', view, err.message);
+      inspectError(err);
+    }
     return undefined;
   }
 }

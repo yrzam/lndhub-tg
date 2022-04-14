@@ -19,6 +19,9 @@
     "noEmitOnError": true,
     "baseUrl": "src",
     "paths": {
+      "@*": [
+        "*"
+      ],
       "@model/*": [
         "model/*"
       ],

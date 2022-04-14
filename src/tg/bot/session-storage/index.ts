@@ -1,3 +1,4 @@
+import winston from '@utils/logger-service';
 import mongoose from 'mongoose';
 import type MongoStorage from '@satont/grammy-mongodb-storage';
 
@@ -10,15 +11,17 @@ export default class SessionDB {
 
   constructor(url: string, collectionMutator = '') {
     this.dbUrl = url;
-    this.collectionName = `session-${collectionMutator}`;
+    this.collectionName = collectionMutator ? `sessions-${collectionMutator}` : 'sessions';
   }
 
   async start(): Promise<void> {
+    winston.debug('Launching bot: connecting to session DB...');
     await new Promise((resolve, reject) => {
       this.connection = mongoose.createConnection(this.dbUrl);
       this.connection.on('connected', () => resolve(undefined));
       this.connection.on('error', (err) => reject(err));
     });
+    winston.debug('Launching bot: connection with session DB established');
   }
 
   getSessionStorage() {
@@ -27,6 +30,7 @@ export default class SessionDB {
   }
 
   async stop(): Promise<void> {
+    winston.debug('Stopping bot: disconnecting from session DB.');
     await this.connection?.close();
   }
 }

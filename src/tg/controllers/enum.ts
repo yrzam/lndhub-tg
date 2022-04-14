@@ -1,7 +1,7 @@
 import Help from './entries/help';
 import Admin from './entries/admin';
 import UnavailNotifier from './entries/unavailable';
-import InlineInvoice from './entries/inline-invoice';
+import SimpleInlineInvoice from './entries/simple-inline-invoice';
 import AddWallet from './entries/add-wallet';
 import ManageWallets from './entries/manage-wallets';
 import Settings from './entries/settings';
@@ -13,7 +13,7 @@ export const controllers = {
   Help,
   Admin,
   UnavailNotifier,
-  InlineInvoice,
+  SimpleInlineInvoice,
   AddWallet,
   ManageWallets,
   Settings,
