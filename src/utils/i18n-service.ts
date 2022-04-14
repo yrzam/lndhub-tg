@@ -5,7 +5,7 @@ export const i18n = new I18n({
   defaultLanguageOnMissing: true,
   directory: 'res/locales',
   useSession: true,
-  defaultLanguage: 'ru',
+  defaultLanguage: 'en',
   templateData: {
     opt(optVar: unknown, asVar: string, useKey: string) {
       if (optVar) {

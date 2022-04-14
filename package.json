@@ -1,6 +1,6 @@
 {
   "name": "lndhub-tg",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Telegram bot that is a client for LndHub service",
   "main": "build/index.js",
   "directories": {

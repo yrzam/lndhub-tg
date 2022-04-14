@@ -1,0 +1,220 @@
+# FUNCTION DOC
+# ${opt(EXTERNAL_VAR, 'asVar', 'useKey')} - if EXTERNAL_VAR is not empty,
+#     translation of useKey will be called with EXTERNAL_VAR passed as asVar
+
+greeting: "Welcome!\n\nThis bot is a crypto wallet for the Lightning Network. It allows you to connect to custodial storages and manage your funds, much like banking apps do. \n\nSource code: <a href=\"https://github.com/yrzam/lndhub-tg\">bot</a>, <a href=\"https://github.com/BlueWallet/LndHub\">server</a>"
+
+static:
+  unavail: <b>Sorry, the feature is temporarily unavailable</b> 
+  unavailInline: Temporarily unavailable
+
+basic:
+  cancelButton: ❌ Cancel
+  doneButton: ✅ Done
+
+commands:
+  home: Home
+  wallets: Wallet management
+  settings: Settings
+  cancel: Cancel
+
+simpleInline:
+  title: ${num} ${currency} invoice${opt(wallet, 'wallet', 'simpleInline.opt.wallet')}
+  description: "Request ${amount} sat. ${opt(bias, 'biasPercent', 'simpleInline.opt.bias')}${opt(description, 'description', 'simpleInline.opt.description')}"
+  qConfirm: "Transfer <b>${num} ${currency}</b> from <b>${wallet}</b> wallet${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}\n\n${name}, Are you sure?"
+  message:
+    pending: Generating ${num} ${currency} invoice...
+    collapsed: "<b>${num} ${currency}</b> invoice${opt(amount, 'amount', 'simpleInline.opt.amount')}.${opt(description, 'description', 'simpleInline.opt.descriptionInMessage')}${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}"
+    expanded: "<b>${num} ${currency}</b> invoice${opt(amount, 'amount', 'simpleInline.opt.amount')}.${opt(description, 'description', 'simpleInline.opt.descriptionInMessage')}${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}\n\nCreated: ${created}\nExpires: ${expires}\n\nRequest: <code>${payReq}</code>"
+    cancelled: Invoice cancelled
+    confirmedBySender: 💸 The sender marked the <b>${num} ${currency}</b> invoice as paid
+    confirmed: "✅ <b>${num} ${currency}</b> payment recieved!"
+  buttons:
+    pleaseWait: Please wait...
+    pay: 💸 Pay ${num} ${currency}
+    expand: ⏬ Expand
+    collapse: ⏫ Collapse
+    cancel: ❌ Cancel
+    changeWallet: 🔃 Change wallet
+    back: ⬅️ Back
+    alreadyPaid: Mark as paid
+    openWallet: Open wallet
+    yes: "Yes"
+    no: "No"
+  opt:
+    wallet: " -> ${wallet}"
+    bias: "Offset: ${biasPercent}%"
+    description: "\nDescription: ${description}"
+    descriptionInMessage: "\n\nDescription: ${description}"
+    biasInMessage: "\n\n<i>Offset: ${biasPercent}%</i>"
+    amount: " (${amount} sat)"
+  noWallets: First you need to create a wallet. Press here
+
+addWallet:
+  qCreateOrImport: Let's get started! Want to create a new wallet or add an existing one?
+  qCreateDefaultOrCustom: "Good. Choose which host you want to use.\n\n<i>⚠️ Remember - it is the host that stores your crypto. The attacker host can misrepresent any data, including displaying an unsecured balance and embezzling your funds. By continuing, you confirm that you trust the funds to the selected host and understand the risks associated with the use of this bot.</i>"
+  qCreateCustomUrl: Enter the URL of the host where you want to create a wallet
+  qImportUrl: "Enter the URL for importing your wallet.\n\n<i>⚠️ Remember - it is the host that stores your crypto. The attacker host can misrepresent any data, including displaying an unsecured balance and embezzling your funds. By continuing, you confirm that you trust the funds to the selected host and understand the risks associated with the use of this bot.</i>"
+  qName: Ready! The last step is to choose a name for the new wallet. No more than 15 characters
+  pending: Trying to reach the server. Wait a while...
+  saveKey: "Please, <b>store the key securely and never share it with anyone</b> - it is needed to access the wallet.\n\n<code>${backup}</code>"
+  buttons:
+    create: 🆕 Create
+    import: ⤵️ Import
+    defaultHost: 😉 Our
+    customHost: 👤 Custom
+    keySaved: ✅ I saved the key
+
+manageWallets:
+  readyUiMsg: Wallet management
+  list: "Wallet list.\n\n<i>For the details, click on one of the buttons</i>"
+  item: "Wallet <b>${name}</b>\n\nHost: ${hubUrl}\nID: ${id}${opt(isActive, 'isActive', 'manageWallets.opt.isActive')}"
+  qDeleteConf: Are you sure you want to delete the wallet <b>${wallet}</b>?
+  qNewName: Type the new name of the wallet <b>${wallet}</b>. Maximum size - 15 characters
+  editDone: Edit completed
+  saveKey: "This key allows you to access your wallet. <b>Never share it with third parties.</b>\n\n<code>${backup}</code>"
+  opt:
+    isActive: "\n\n✅ Marked as primary"
+  buttons:
+    new: 🆕 Add new 🆕
+    makeActive: ✅ Mark as primary
+    delete: 🗑 Delete
+    rename: ✏️ Rename
+    saveKey: 🔏 Save key
+    resetPrior: 〽️ Reset priority
+    back: ⬅️ Back
+    yes: "Yes"
+    no: "No"
+
+home:
+  sendReceiveUiMsg: Getting wallet data...
+  minimalWallet: "Wallet <b>${wallet}</b>\n\nBalance: <b>${balance} ${currency}</b>\n\nUpdated: ${updated}"
+  expandedWallet: "Wallet <b>${wallet}</b>\n\nBalance: <b>${balance} ${currency}</b>${opt(amount, 'amount', 'home.opt.amount')}${opt(bias, 'biasPercent', 'home.opt.bias')}\n\nHost: ${hubUrl}\n\nPayments:\n${txs}\n\nGenerated invoives:\n${pendingInvs}\n\nUpdated: ${updated}"
+  inTx: 🟩 <b>+${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
+  outTx: 🟥 <b>-${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
+  pendingInvo: 🟦 <b>${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
+  expiredInvo: ❌ <b>${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
+  onchainDescription: BTCereplenishment${opt(confCount, 'confCount', 'home.opt.onchainConfCount')}
+  txDetailed: "${prefix} ${i}\n\nVolume: <b>${num} ${currency}</b>${opt(amount, 'amount', 'home.opt.amount')}${fee}${opt(description, 'description', 'home.opt.descriptionDetailed')}\n\nDate of creation: ${date}"
+  inTxPrefix: 🟩 Inbound payment
+  outTxPrefix: 🟥 Outbound payment
+  unpaidInvoDetailed: "${prefix} ${i}\n\nVolume: <b>${num} ${currency}</b>${opt(amount, 'amount', 'home.opt.amount')}${opt(payReq, 'payReq', 'home.opt.payReqDetailed')}${opt(description, 'description', 'home.opt.descriptionDetailed')}\n\nCreated: ${created}\nExpires: ${expires}"
+  payableInvoPrefix: 🟦 Active invoice
+  unpayableInvoPrefix: ❌ Expired invoice
+  buttons:
+    receive: 🔽 Receive
+    send: 🔼 Send
+    walletN: 📝 Wallet${opt(wallet, 'wallet', 'home.opt.wallet')}
+    update: 🔄 Update
+    expandTxs: ⏬ Expand
+    collapseTxs: ⏫ Collapse
+    close: Close
+  opt:
+    wallet: " ${wallet}"
+    description: " ${description}"
+    descriptionDetailed: "\n\nDescription: ${description}"
+    feeDetailed: "\nApproximate fee: ${num} ${currency}${opt(amount, 'amount', 'home.opt.amount')}"
+    payReqDetailed: "\n\nRequest: <code>${payReq}</code>"
+    onchainConfCount: " (${confCount} conf.)"
+    amount: " (${amount} sat)"
+    bias: "\nOffset: ${biasPercent}%"
+
+receive:
+  qBtcOrLnOrLnCustom: "Please, select a payment method:\n\n<b>LN BTC</b> - standard Lightning invoice\n<b>BTC</b> - replenishment from bitcoin wallet\n<b>Bot</b> - customizable Lightning invoice, the recipient will need this bot"
+  btc: "To replenish the balance, send BTC to this address:\n\n<code>${address}</code>\n\nPlease note - to transfer funds to the balance, you will need to wait for at least 3 network confirmations (about 30 minutes)"
+  qLnDescription: "Let's get started. Type the invoice description\n\n<i>To abort press /cancel</i>"
+  qLnAmount: "Enter the amount and currency you want to receive (the default currency is <b>${currency}</b>).\n\n<i>Mathematical expressions as well as the name of the currency are allowed (for example, 2 + 2 dollar)</i>"
+  qLnConfirm: "Invoice to <b>${wallet}</b> wallet.\n\nAmount: <b>${num} ${currency}</b>${opt(amount, 'amount', 'receive.opt.amount')}${opt(bias, 'biasPercent', 'receive.opt.bias')}\n\nCorrect?"
+  ln: "Invoice generated \"${description}\":\n\n<code>${payReq}</code>"
+  confirmed: Confirmed
+  declined: Declined. Let's try again
+  buttons:
+    ln: ⚡ Lightning Network ⚡
+    btc: ⛓️ BTC On-chain
+    lnCustom: 📨 Bot
+    yes: "Yes"
+    no: "No"
+    alsoTryInline: Continue inline...
+  opt:
+    bias: "\nOffset: ${biasPercent}%"
+    amount: " (${amount} sat)"
+
+send:
+  prompt: "Please send an invoice or a photo of a suitable QR code.\n\n<i>To abort press /cancel</i>"
+  qLnConfirm: "Send money from <b>${wallet}</b> wallet.\n\nAmount: <b>${num} ${currency}</b>${opt(amount, 'amount', 'send.opt.amount')}${opt(description, 'description', 'send.opt.description')}\n\nCreated: ${created}\nExpires: ${expires}\n\nClick the button to make a payment"
+  lnExpired: "Amount: <b>${num} ${currency}</b>${opt(amount, 'amount', 'send.opt.amount')}${opt(description, 'description', 'send.opt.description')}\nCreated: ${created}\n\nThis invoice has expired."
+  confirmed: Confirmed
+  declined: Declined
+  buttons:
+    cancel: Cancel
+    pay: Pay
+  opt:
+    amount: " (${amount} sat)"
+    description: "Description: \"${description}\""
+    pay: Pay
+  paid: 👌 Payment completed! <b>(-${num} ${currency})</b>
+
+currencies:
+  extraAliases: |
+    RUB: rub, rouble
+    USD: usd, dollar
+  list:
+    RUB: ₽
+    USD: $
+    SAT: sat
+
+settings:
+  readyUiMsg: Settings
+  main: "Current settings:\n\nLanguage: <b>${language}</b>\nCurrency: <b>${currency}</b>\nOffset: <b>${biasPercent}</b>\n\n<i>All transactions take place in Satoshi, other currencies are presented solely for convenience. Offset allows you to manage the rate at which the bot converts amounts for display.\n\nClick on one of the buttons below to change the settings</i>"
+  qLanguage: "Please select a preferred language from the list below:"
+  qCurrency: "Please select the preferred currency from the list below:"
+  qNewBias: "Type new offset (in percentages). Both positive and negative numbers are allowed.\n\n<i>For example, if the value is set to -10%, the BTC rate against the fiat currency will be reduced by 10%, if the value is set to 100%, it will be doubled. 0 removes offset</i>"
+  editDone: Edit completed
+  buttons:
+    back: ⬅️ Back
+    language: Language
+    currency: Currency
+    bias: Offset
+
+errors:
+  hub:
+    unknown: "Something went wrong\n\n${error}"
+    badAuth: Authorization error
+    badPartner: Recipient side error
+    lowBalance: Low balance
+    invalidInvoice: Invalid invoice
+    backendError: Server error. Most likely, this invoice has already been paid
+    badArgs: Operation rejected due to invalid parameters
+    prevInTransit: The previous payment is still in progress. Please try again later
+    paymentFailed: Payment failed. Most likely, there is no route to the recipient
+    hubShutdown: The host is shutting down. Please withdraw the remaining funds
+  input:
+    noAction: "Action not recognized. Please answer the bot's question.\n\nTo abort operation press /cancel"
+    cbNoAction: Action out of context
+    invalidUrl: Invalid URL. Please try again
+    nameTooLong: The name is too long
+    parseAmountError: Failed to recognize the amount
+    noSuchCurrency: Such a currency does not exist
+    noSuchLanguage: Such a language does not exist
+    invalidNumber: Invalid number
+    badAddress: "Incorrect invoice (${wrongAddr}).\n\nPlease, try again"
+    qrScanFailed: Failed to recognize a QR code. Please try again
+    tooManyWallets: Too many wallets. Please, delete an existing one to add more
+    walletNotActive: This wallet is not set as primary
+  inlineInv:
+    noWallets: ${name}, you don't have any wallets in the bot. Go back and add a wallet, or pay the invoice externally.
+    notFound: Invoice not found
+    unpayable: The invoice has expired or has already been paid
+    unknown: Something went wrong
+    createFailed: "Failed to create invoice.\n\nWallet error: <i>${walletError}</i>"
+    paymentFailed: "Failed to pay invoice"
+  reqInvalid: Incorrect request
+  ansInvalid: Incorrect response received
+  noConnection: Failed to establish a connection
+  rateLimited: Request rate exceeded
+  unknown: Sorry, something went wrong
+  noTxEntry: No such transaction exists.
+
+languages:
+  en: English
+  ru: Русский

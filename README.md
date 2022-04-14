@@ -1,7 +1,7 @@
 # lndhub-tg
 **Multi-user LndHub client implemented as Telegram bot.**
 
-LndHub is a backend solution for Lightning Network custodial wallets. It provides HTTP API, which de-facto became a standard for Lightning accounting. This bot acts like a client for that backend: same as BlueWallet app, but on Telegram. It provides some abstraction and user interaction features, although does not encourage centralization. You should always be able to run your instance of bot and and connect to the hub of your choise with minimal drawbacks.
+LndHub is a backend solution for Lightning Network custodial wallets. It provides HTTP API, which de-facto became a standard for Lightning accounting. This bot acts like a client for that backend: same as BlueWallet app, but on Telegram. It provides some abstraction and user interaction features, although does not encourage centralization. You should always be able to run your instance of bot and connect to the hub of your choiсe with minimal drawbacks.
 
 Please remember that the following parties will have full access to your funds: LndHub host owner, Bot instance owner and Telegram. LndHub and this Bot are open source, feel free to host them yourself.
 
