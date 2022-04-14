@@ -69,7 +69,7 @@ manageWallets:
   readyUiMsg: Wallet management
   list: "Wallet list.\n\n<i>For the details, click on one of the buttons</i>"
   item: "Wallet <b>${name}</b>\n\nHost: ${hubUrl}\nID: ${id}${opt(isActive, 'isActive', 'manageWallets.opt.isActive')}"
-  qDeleteConf: Are you sure you want to delete the wallet? <b>${wallet}</b>?
+  qDeleteConf: Are you sure you want to delete the wallet <b>${wallet}</b>?
   qNewName: Type the new name of the wallet <b>${wallet}</b>. Maximum size - 15 characters
   editDone: Edit completed
   saveKey: "This key allows you to access your wallet. <b>Never share it with third parties.</b>\n\n<code>${backup}</code>"
@@ -186,7 +186,7 @@ errors:
     backendError: Server error. Most likely, this invoice has already been paid
     badArgs: Operation rejected due to invalid parameters
     prevInTransit: The previous payment is still in progress. Please try again later
-    paymentFailed: Payment failed. Most likely, there is no path to the recipient
+    paymentFailed: Payment failed. Most likely, there is no route to the recipient
     hubShutdown: The host is shutting down. Please withdraw the remaining funds
   input:
     noAction: "Action not recognized. Please answer the bot's question.\n\nTo abort operation press /cancel"
