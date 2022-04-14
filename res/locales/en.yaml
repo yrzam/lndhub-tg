@@ -150,7 +150,7 @@ send:
     pay: Pay
   opt:
     amount: " (${amount} sat)"
-    description: "\Description: \"${description}\""
+    description: "Description: \"${description}\""
     pay: Pay
   paid: 👌 Payment completed! <b>(-${num} ${currency})</b>
 
