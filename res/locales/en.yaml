@@ -122,7 +122,7 @@ home:
 receive:
   qBtcOrLnOrLnCustom: "Please, select a payment method:\n\n<b>LN BTC</b> - standard Lightning invoice\n<b>BTC</b> - replenishment from bitcoin wallet\n<b>Bot</b> - customizable Lightning invoice, the recipient will need this bot"
   btc: "To replenish the balance, send BTC to this address:\n\n<code>${address}</code>\n\nPlease note - to transfer funds to the balance, you will need to wait for at least 3 network confirmations (about 30 minutes)"
-  qLnDescription: "Let's get started. Type the invoice description?\n\n<i>To abort press /cancel</i>"
+  qLnDescription: "Let's get started. Type the invoice description\n\n<i>To abort press /cancel</i>"
   qLnAmount: "Enter the amount and currency you want to receive (the default currency is <b>${currency}</b>).\n\n<i>Mathematical expressions as well as the name of the currency are allowed (for example, 2 + 2 dollar)</i>"
   qLnConfirm: "Invoice to <b>${wallet}</b> wallet.\n\nAmount: <b>${num} ${currency}</b>${opt(amount, 'amount', 'receive.opt.amount')}${opt(bias, 'biasPercent', 'receive.opt.bias')}\n\nCorrect?"
   ln: "Invoice generated \"${description}\":\n\n<code>${payReq}</code>"
