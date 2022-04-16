@@ -89,8 +89,8 @@ const Home = {
           .text(ctx.i18n.t('home.buttons.expandTxs'), cbPrefixes.home.expand + data.id),
       },
     );
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     if (data.action === 'send') delDetailedState(ctx);
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
   },
 
   showExpanded: async (ctx: Ctx, data: ExpandedWalletData &

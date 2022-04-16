@@ -210,7 +210,7 @@ const SimpleInlineInvoice = {
     await ctx.editMessageText(
       ctx.i18n.t(
         `errors.inlineInv.${err.data.type === 'getInfoFailed' ? err.data.getInfoError : err.data.type}`,
-        err.data.type === 'createFailed'
+        err.data.type !== 'getInfoFailed'
           ? {
             walletError: ctx.i18n.t(err.data.walletError.data.type === 'serverError'
               ? `errors.hub.${err.data.walletError.data.serverError.key}`

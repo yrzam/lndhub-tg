@@ -30,8 +30,8 @@ const ManageWallets = {
       ctx.i18n.t('manageWallets.list'),
       { reply_markup: kb },
     );
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     if (data.action === 'send') ctx.state.msgToEdit = msg?.message_id;
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
   },
 
   item: async (ctx: Ctx, data: WalletPublicData & {
@@ -64,8 +64,8 @@ const ManageWallets = {
       }),
       { reply_markup: kb, disable_web_page_preview: true },
     );
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     if (data.action === 'send') ctx.state.msgToEdit = msg?.message_id;
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
   },
 
   askDeleteConfirm: async (ctx: Ctx, data: WalletPublicData) => {

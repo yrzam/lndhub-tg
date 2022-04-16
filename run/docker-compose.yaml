@@ -10,7 +10,7 @@ services:
       - './data:/data/db'
 
   lndhub-tg:
-    image: lndhub-tg:1.1.1
+    image: lndhub-tg:1.1.2
     build:
       context: ..
     container_name: lndhub-tg

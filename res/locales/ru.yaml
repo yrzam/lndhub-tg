@@ -205,7 +205,7 @@ errors:
     unpayable: Инвойс истек, либо уже был оплачен
     unknown: Что-то пошло не так
     createFailed: "Не удалось создать инвойс.\n\nОшибка кошелька: <i>${walletError}</i>"
-    paymentFailed: "Не удалось оплатить инвойс"
+    paymentFailed: "Не удалось оплатить инвойс\n\nОшибка кошелька: <i>${walletError}</i>"
   reqInvalid: Некорректный запрос
   ansInvalid: Получен некорректный ответ
   noConnection: Не удалось установить соединение
