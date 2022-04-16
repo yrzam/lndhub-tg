@@ -59,7 +59,7 @@ export default class AddWallet extends Controller {
       if (!validUrl.isWebUri(ctx.message.text)) throw new InputError('invalidUrl');
       await Promise.all([
         view('AddWallet.pending', ctx, { verbose: true }),
-        Wallet.create(config.get('model.defaultHubUrl'))
+        Wallet.create(ctx.message.text)
           .then(async (res) => {
             ctx.state.addWalletData = { id: res.id, backup: await res.backup };
           })]);
