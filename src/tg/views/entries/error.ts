@@ -9,7 +9,10 @@ const Common = {
     const errStr = ctx.i18n.t(err.data.type === 'serverError'
       ? `errors.hub.${err.data.serverError.key}`
       : `errors.${err.data.type}`, { error: esc(err.message) });
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery({ text: errStr, show_alert: true });
+    if (ctx.callbackQuery) {
+      await ctx.answerCallbackQuery({ text: errStr, show_alert: true })
+        .catch((e) => e);
+    }
     if (ctx.from?.id && ctx.chat?.id) await ctx.reply(errStr);
   },
 
