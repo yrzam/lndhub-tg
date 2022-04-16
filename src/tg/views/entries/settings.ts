@@ -26,8 +26,8 @@ const Settings = {
         .text(ctx.i18n.t('settings.buttons.currency'), cbPrefixes.settings.currPage).row()
         .text(ctx.i18n.t('settings.buttons.bias'), cb.settings.bias),
     });
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     if (data === 'send') ctx.state.msgToEdit = msg?.message_id;
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
   },
 
   language: async (ctx: Ctx) => {
