@@ -207,7 +207,7 @@ errors:
     unpayable: The invoice has expired or has already been paid
     unknown: Something went wrong
     createFailed: "Failed to create invoice.\n\nWallet error: <i>${walletError}</i>"
-    paymentFailed: "Failed to pay invoice"
+    paymentFailed: "Failed to pay invoice.\n\nWallet error: <i>${walletError}</i>"
   reqInvalid: Incorrect request
   ansInvalid: Incorrect response received
   noConnection: Failed to establish a connection
