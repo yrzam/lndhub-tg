@@ -28,7 +28,7 @@ simpleInline:
     expanded: "<b>${num} ${currency}</b> invoice${opt(amount, 'amount', 'simpleInline.opt.amount')}.${opt(description, 'description', 'simpleInline.opt.descriptionInMessage')}${opt(bias, 'biasPercent', 'simpleInline.opt.biasInMessage')}\n\nCreated: ${created}\nExpires: ${expires}\n\nRequest: <code>${payReq}</code>"
     cancelled: Invoice cancelled
     confirmedBySender: 💸 The sender marked the <b>${num} ${currency}</b> invoice as paid
-    confirmed: "✅ <b>${num} ${currency}</b> payment recieved!"
+    confirmed: "✅ <b>${num} ${currency}</b> payment received!"
   buttons:
     pleaseWait: Please wait...
     pay: 💸 Pay ${num} ${currency}
@@ -89,7 +89,7 @@ manageWallets:
 home:
   sendReceiveUiMsg: Getting wallet data...
   minimalWallet: "Wallet <b>${wallet}</b>\n\nBalance: <b>${balance} ${currency}</b>\n\nUpdated: ${updated}"
-  expandedWallet: "Wallet <b>${wallet}</b>\n\nBalance: <b>${balance} ${currency}</b>${opt(amount, 'amount', 'home.opt.amount')}${opt(bias, 'biasPercent', 'home.opt.bias')}\n\nHost: ${hubUrl}\n\nPayments:\n${txs}\n\nGenerated invoives:\n${pendingInvs}\n\nUpdated: ${updated}"
+  expandedWallet: "Wallet <b>${wallet}</b>\n\nBalance: <b>${balance} ${currency}</b>${opt(amount, 'amount', 'home.opt.amount')}${opt(bias, 'biasPercent', 'home.opt.bias')}\n\nHost: ${hubUrl}\n\nPayments:\n${txs}\n\nGenerated invoices:\n${pendingInvs}\n\nUpdated: ${updated}"
   inTx: 🟩 <b>+${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
   outTx: 🟥 <b>-${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
   pendingInvo: 🟦 <b>${num} ${currency}</b>${opt(description, 'description', 'home.opt.description')}
