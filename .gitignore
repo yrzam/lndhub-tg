@@ -2,6 +2,7 @@
 run/*
 !run/docker-compose.yaml
 !run/env-guide.md
+!run/custom-setup-guide.md
 
 # Logs
 logs

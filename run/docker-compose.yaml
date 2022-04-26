@@ -10,9 +10,9 @@ services:
       - './data:/data/db'
 
   lndhub-tg:
-    image: yrzam/lndhub-tg:1.1.3
-    build:
-      context: ..
+    image: yrzam/lndhub-tg:v1.1.3
+    #build:
+    #  context: ..
     container_name: lndhub-tg
     restart: unless-stopped
     depends_on:
